@@ -1,9 +1,9 @@
 
 import React, { useState, useCallback, useRef, useEffect } from 'react';
-import Table from './components/Table';
-import Coin from './components/Coin';
-import { GameState, GRID_CONFIG } from './types';
-import { getDealerCommentary } from './services/geminiService';
+import Table from './components/Table.tsx';
+import Coin from './components/Coin.tsx';
+import { GameState, GRID_CONFIG } from './types.ts';
+import { getDealerCommentary } from './services/geminiService.ts';
 
 const App: React.FC = () => {
   const [state, setState] = useState<GameState>({
@@ -25,7 +25,6 @@ const App: React.FC = () => {
 
   const totalWager = state.betAmount * state.selectedNumbers.length;
 
-  // Auto-scroll log to bottom
   useEffect(() => {
     logEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [state.logs]);
@@ -42,7 +41,7 @@ const App: React.FC = () => {
       if (isSelected) {
         return { ...prev, selectedNumbers: prev.selectedNumbers.filter(n => n !== num) };
       }
-      if (prev.selectedNumbers.length >= 3) return prev; // Limit to 3 numbers
+      if (prev.selectedNumbers.length >= 3) return prev;
       return { ...prev, selectedNumbers: [...prev.selectedNumbers, num] };
     });
   };
@@ -93,7 +92,6 @@ const App: React.FC = () => {
   const tossCoin = () => {
     if (state.isTossing || !state.isBetPlaced) return;
 
-    // Randomize result (1-12)
     const newResult = Math.floor(Math.random() * 12) + 1;
     const target = cellPositions.current[newResult];
 
@@ -112,8 +110,6 @@ const App: React.FC = () => {
     ) || null;
 
     const isWin = finalResult ? state.selectedNumbers.includes(finalResult) : false;
-    
-    // Payout Multipliers: 1 Pick = 10x, 2 Picks = 4x, 3 Picks = 2x
     const baseMultiplier = state.selectedNumbers.length === 1 ? 10 : (state.selectedNumbers.length === 2 ? 4 : 2);
     
     let newStreak = isWin ? state.streak + 1 : 0;
@@ -146,12 +142,10 @@ const App: React.FC = () => {
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center p-8 arcade-floor">
-      {/* Top Laser Accent */}
       <div className="absolute top-0 inset-x-0 h-2 bg-gradient-to-r from-blue-600 via-amber-400 to-red-600 shadow-[0_0_25px_rgba(251,191,36,0.6)] z-20"></div>
 
       <div className="relative w-full max-w-7xl flex flex-col gap-10 z-10">
         
-        {/* Dynamic Header HUD */}
         <div className="flex flex-col md:flex-row justify-between items-center bg-slate-900/60 rounded-[3.5rem] p-10 border border-white/5 backdrop-blur-3xl gap-10 shadow-[0_30px_60px_rgba(0,0,0,0.6)]">
             <div className="text-center md:text-left">
                 <h1 className="font-['Bungee'] text-6xl text-white tracking-[0.15em] drop-shadow-[0_6px_0_#92400e] italic uppercase">STREET COIN</h1>
@@ -169,7 +163,6 @@ const App: React.FC = () => {
             </div>
             
             <div className="bg-black/80 px-14 py-8 rounded-[3rem] border border-white/10 flex-1 max-w-2xl text-center shadow-inner relative overflow-hidden group">
-                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
                 <p className="text-amber-100 font-bold italic text-3xl leading-tight tracking-tight relative z-10">
                     &ldquo;{state.dealerMessage}&rdquo;
                 </p>
@@ -177,7 +170,6 @@ const App: React.FC = () => {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
-            {/* Sidebar: Transaction Logs */}
             <div className="lg:col-span-3 panel-glass rounded-[3rem] p-10 flex flex-col h-[550px] border-l-[12px] border-amber-600 shadow-2xl">
                 <span className="text-[12px] font-black text-amber-400 uppercase tracking-[0.5em] mb-10 flex items-center gap-4">
                     <span className="w-2.5 h-2.5 bg-amber-500 rounded-full shadow-[0_0_12px_#f59e0b]"></span>
@@ -201,7 +193,6 @@ const App: React.FC = () => {
                 </div>
             </div>
 
-            {/* Main Center: Table Board */}
             <div className="lg:col-span-9 relative flex flex-col items-center">
                 <Table 
                     onCellPosition={handleCellPosition} 
@@ -218,9 +209,7 @@ const App: React.FC = () => {
             </div>
         </div>
 
-        {/* Console: HUD Controls */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-10 bg-slate-900/95 p-10 rounded-[4rem] border-t border-white/10 shadow-[0_40px_100px_rgba(0,0,0,0.8)] relative z-10">
-            {/* Bank Display */}
             <div className="flex flex-col gap-4 p-6 rounded-[2.5rem] bg-black/50 border border-white/5 shadow-inner">
                 <span className="text-[11px] font-black text-slate-500 uppercase tracking-[0.5em] text-center">BANKROLL</span>
                 <div className="flex-1 flex flex-col items-center justify-center">
@@ -231,7 +220,6 @@ const App: React.FC = () => {
                 </div>
             </div>
 
-            {/* Cash-In Buttons */}
             <div className="flex flex-col gap-4 p-6 rounded-[2.5rem] bg-black/50 border border-white/5">
                 <span className="text-[11px] font-black text-emerald-500 uppercase tracking-[0.5em] text-center">DEPOSIT</span>
                 <div className="flex gap-4 flex-1">
@@ -241,7 +229,6 @@ const App: React.FC = () => {
                 </div>
             </div>
 
-            {/* Wager Settings */}
             <div className="md:col-span-1 flex flex-col gap-4 p-6 rounded-[2.5rem] bg-black/50 border border-white/5">
                 <span className="text-[11px] font-black text-amber-500 uppercase tracking-[0.5em] text-center">STAKE</span>
                 <div className="flex gap-5 h-full">
@@ -268,7 +255,6 @@ const App: React.FC = () => {
                 </div>
             </div>
 
-            {/* Action Button */}
             <div className="flex items-stretch">
                 <button
                     onClick={tossCoin}
@@ -288,7 +274,6 @@ const App: React.FC = () => {
             </div>
         </div>
 
-        {/* History & Active Slots Footer */}
         <div className="flex flex-col md:flex-row justify-between items-center gap-16 px-16 py-10">
             <div className="flex items-center gap-10">
                 <span className="text-[12px] font-black text-slate-600 uppercase tracking-[0.6em]">PLAYER SLOTS</span>
